@@ -1,0 +1,89 @@
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
+
+
+df = yf.download('BTC-USD', start='2020-01-01', end='2025-01-01')
+df = df[['Close', 'Volume']]
+
+
+df['MA_7'] = df['Close'].rolling(window=7).mean()
+df['MA_30'] = df['Close'].rolling(window=30).mean()
+df['Volatility'] = df['Close'].rolling(window=7).std()
+df['Returns'] = df['Close'].pct_change()
+
+
+df['Target'] = df['Close'].shift(-1)
+
+
+df.dropna(inplace=True)
+
+
+train_size = int(len(df) * 0.8)
+train, test = df.iloc[:train_size], df.iloc[train_size:]
+
+X_train = train.drop('Target', axis=1)
+y_train = train['Target']
+X_test = test.drop('Target', axis=1)
+y_test = test['Target']
+
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+
+plt.figure(figsize=(12, 6))
+plt.plot(df.index, df['Close'], label='Prix Clôture')
+plt.title('Évolution du prix du BTC')
+plt.legend()
+plt.show()
+
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+plt.title('Heatmap des Corrélations')
+plt.show()
+
+
+models = {
+    "Linear Regression": LinearRegression(),
+    "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42),
+    "XGBoost": xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100)
+}
+
+results = {}
+
+for name, model in models.items():
+    # Entraînement
+    model.fit(X_train_scaled, y_train)
+    
+    # Prédiction
+    preds = model.predict(X_test_scaled)
+    
+    # Évaluation
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+    results[name] = rmse
+    print(f"{name} RMSE: {rmse}")
+
+
+print("\nComparaison des modèles (RMSE le plus bas est le meilleur):")
+print(results)
+
+best_model = models["XGBoost"]
+preds = best_model.predict(X_test_scaled)
+
+plt.figure(figsize=(12, 6))
+plt.plot(test.index, y_test, label='Réel', color='blue')
+plt.plot(test.index, preds, label='Prédiction XGBoost', color='red', alpha=0.7)
+plt.title('Prédiction vs Réalité (BTC)')
+plt.legend()
+plt.show()
