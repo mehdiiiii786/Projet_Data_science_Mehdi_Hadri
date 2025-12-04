@@ -1,0 +1,67 @@
+# 📈 Prévision Crypto (Bitcoin) - Data Science Project
+
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![Library](https://img.shields.io/badge/Library-Scikit--Learn-orange)
+![Library](https://img.shields.io/badge/Library-XGBoost-green)
+
+## 📄 Contexte de la Mission
+Ce projet s'inscrit dans le cadre du module **Data Science & Machine Learning** (Année 2025-2026).
+En tant que **Data Scientist**, la mission consiste à transformer des données financières brutes en informations exploitables et à modéliser une intelligence artificielle capable de prédire l'évolution du marché.
+
+### 🎯 Objectifs
+1.  **Collecter** les données historiques du Bitcoin (BTC-USD) via Yahoo Finance.
+2.  **Analyser** les tendances et la volatilité (EDA).
+3.  **Construire** un modèle prédictif (Machine Learning) pour estimer le prix de clôture à $J+1$.
+
+---
+
+## 🛠 Méthodologie
+
+### 1. Pipeline de Données (ETL)
+*   **Source :** API `yfinance`.
+*   **Période :** 01/01/2020 - 01/01/2025.
+*   **Nettoyage :** Gestion des valeurs manquantes générées par les indicateurs techniques.
+
+### 2. Feature Engineering
+Nous avons créé des variables techniques pour aider les modèles :
+*   `MA_7`, `MA_30` : Moyennes mobiles pour capter les tendances à court/moyen terme.
+*   `Volatility` : Écart-type glissant (Rollling Std) pour quantifier le risque.
+*   `Returns` : Rendements journaliers.
+
+### 3. Modélisation
+Comparaison de trois approches :
+*   **Régression Linéaire (Baseline)** : Modèle simple.
+*   **Random Forest** : Modèle non-linéaire ensembliste.
+*   **XGBoost** : Gradient Boosting optimisé pour la performance.
+
+---
+
+## 📊 Résultats & Analyse
+
+Les performances sont évaluées via la **RMSE** (Root Mean Squared Error).
+
+| Modèle | RMSE (Performance) |
+|:-------|:------------------:|
+| Linear Regression | *[Insérez votre score ici]* |
+| Random Forest | *[Insérez votre score ici]* |
+| **XGBoost (Best)** | **[Insérez votre score ici]** |
+
+> **Interprétation :** Le modèle XGBoost offre la meilleure généralisation en minimisant l'erreur de prédiction sur les données de test (20% dernières données).
+
+### Visualisations
+*(Assurez-vous d'ajouter vos captures d'écran dans le dépôt)*
+
+#### Évolution du Prix et Prédictions
+![Prédiction vs Réalité](https://via.placeholder.com/800x400?text=Inserer+Image+Prediction+Ici)
+*Comparaison entre le prix réel (Bleu) et la prédiction XGBoost (Rouge).*
+
+---
+
+## 💻 Installation et Utilisation
+
+Pour reproduire ce projet en local, suivez ces étapes :
+
+### 1. Cloner le dépôt
+```bash
+git clone https://github.com/votre-nom-utilisateur/nom-du-repo.git
+cd nom-du-repo
